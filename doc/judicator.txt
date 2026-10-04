@@ -1,0 +1,55 @@
+*judicator.txt*  Source-code review comments in Markdown
+
+JUDICATOR                                                        *judicator*
+
+Annotate ordinary files or either side of a two-way Diffview comparison.
+Comments go into review.md at the Git repository root. No setup() is required.
+Requires Neovim 0.10+ and Git. Diffview is optional.
+
+COMMANDS                                                *judicator-commands*
+
+:[range]ReviewComment                                      *:ReviewComment*
+    Open a floating Markdown editor for a comment on the selected lines.
+    Without a range, use the current line. Selections are whole-line based.
+    :w saves and closes the float; :wq also works. :q! cancels.
+    Unsaved source text is captured without writing the source file.
+
+:ReviewEdit                                                   *:ReviewEdit*
+    Open the repository's review.md in a split, creating it if missing.
+    Edit existing comments directly and save with :w. No export step needed.
+    Existing content is used as-is, with no required header or format.
+
+STORAGE                                                  *judicator-storage*
+
+review.md is the source of truth. New comments append; earlier feedback is not
+regenerated. Save unsaved review-buffer edits before adding another comment.
+Clean review buffers refresh after an append so later writes preserve it.
+
+Headings identify path, range, revision, and (for diffs) side. Mutable content
+includes an excerpt; committed content includes its full SHA for Git lookup.
+No snapshots, JSON files, or annotation IDs are stored.
+
+Git ignore settings are not changed. To exclude the review locally, add
+/review.md to .git/info/exclude. Rename review.md to begin a fresh review.
+
+LUA API                                                      *judicator-api*
+
+require('judicator').comment(first, last)
+    Comment on an inclusive line range. Both arguments are optional; the
+    default is the current line.
+
+require('judicator').edit()
+    Open the current repository's review file.
+
+Modules judicator.capture and judicator.review are internal implementation.
+No default mappings or configuration options are provided.
+
+LIMITS                                                    *judicator-limits*
+
+Files must have a name and belong to a Git working tree. Unnamed/special buffers,
+binary files, and merge layouts are unsupported. For added/deleted files, select
+the populated side. Only one Neovim process should write a review at a time.
+Line anchors do not track subsequent edits. Renames and Diffview file-history
+views need further testing. Diffview integration depends on its internal API.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
